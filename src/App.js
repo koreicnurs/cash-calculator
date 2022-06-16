@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import {nanoid} from "nanoid";
+import Split from "./containers/Split/Split";
+import './App.css'
+import Buttons from "./components/Buttons/Buttons";
 
 const App = () => {
 
@@ -14,6 +17,8 @@ const App = () => {
         eachPrice: 0,
         resultPrice: 0,
     })
+
+    let [personPrice, setPersonPrice] = useState(0)
 
     const [people, setPeople] = useState([])
 
@@ -48,7 +53,7 @@ const App = () => {
     }
 
     const count = () => {
-        let resultPrice = order.orderPrice * order.tips / 100
+        let resultPrice = (order.orderPrice * order.tips / 100) + Number(order.transfer)
 
         setResult({
             resultPrice: result.resultPrice = (resultPrice += Number(order.orderPrice)),
@@ -63,14 +68,14 @@ const App = () => {
     const addPerson = () => {
         setPeople(prev => ([
             ...prev,
-            {name: '', price: 0, id: nanoid()}
+            {name: '', price: '', resultPricePerson: 0, id: nanoid()}
         ]))
     }
 
     const bindingPerson = (name, value, id) => {
         setPeople(() => {
             return people.map(person => {
-                if(person.id === id) {
+                if (person.id === id) {
                     return {
                         ...person,
                         [name]: value
@@ -82,10 +87,24 @@ const App = () => {
     };
 
     const removePerson = (id) => {
-      const peopleCopy = people.filter(p => {
-          return p.id !== id
-      })
+        const peopleCopy = people.filter(p => {
+            return p.id !== id
+        })
         setPeople(peopleCopy)
+    }
+
+    const countEach = () => {
+        let a = 0;
+        const copyP = people.map(p => {
+            a += ((p.price * order.tips) / 100) + Number(p.price)
+            return {
+                ...p,
+                resultPricePerson: ((p.price * order.tips) / 100) + Number(p.price)
+            }
+        })
+        personPrice = a
+        setPersonPrice(personPrice)
+        setPeople(copyP)
     }
 
     return (
@@ -103,20 +122,16 @@ const App = () => {
                 </label>
             </div>
             {type === 'evenly' ? (
-                    <form className='evenly'>
-                        <h3>Splitting this cheack three ways</h3>
-                        <input type="people" onChange={e => inputCountPeople(e.target.value)}/>
-                        <input type="priceOrder" onChange={e => inputCountPrice(e.target.value)}/>
-                        <input type="tips" onChange={e => inputCountTips(e.target.value)}/>
-                        <input type="transfer" onChange={e => inputCountTransfer(e.target.value)}/>
-                        <p>{order.peopleQuantity}</p>
-                        <p>{order.orderPrice}</p>
-                        <p>{order.tips}</p>
-                        <p>{order.transfer}</p>
-                        <p>{result.resultPrice}</p>
-                        <p>{result.eachPrice}</p>
-                        <button onClick={count}>Count</button>
-                    </form>
+                    <Split
+                        countPeople={e => inputCountPeople(e.target.value)}
+                        countPrice={e => inputCountPrice(e.target.value)}
+                        countTips={e => inputCountTips(e.target.value)}
+                        countTransfer={e => inputCountTransfer(e.target.value)}
+                        peopleQuantity={order.peopleQuantity}
+                        resultPrice={result.resultPrice}
+                        eachPrice={result.eachPrice}
+                        count={count}
+                    />
                 )
                 : (
                     <form className='each'>
@@ -127,10 +142,19 @@ const App = () => {
                                        onChange={(e) => bindingPerson(e.target.name, e.target.value, person.id)}/>
                                 <input type="text" name='price' value={person.price}
                                        onChange={(e) => bindingPerson(e.target.name, e.target.value, person.id)}/>
-                                <button type='button' onClick={() => removePerson(person.id)}>Remove</button>
+                                <Buttons btnClass='btn-danger' run={() => removePerson(person.id)} name='Remove'/>
                             </div>
                         ))}
-                        <button type='button' onClick={addPerson}>Add</button>
+                        <input type="tips" onChange={e => inputCountTips(e.target.value)}/>
+                        <input type="transfer" onChange={e => inputCountTransfer(e.target.value)}/>
+                        <p>{personPrice}</p>
+                        {people.map(p => {
+                            return (
+                                <p>{p.name}: {p.resultPricePerson}</p>
+                            )
+                        })}
+                        <Buttons btnClass='btn-info' run={addPerson} name='Add'/>
+                        <Buttons btnClass='btn-warning' run={countEach} name='Count'/>
                     </form>
                 )}
         </>

@@ -1,0 +1,11 @@
+.evenly {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.each {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
