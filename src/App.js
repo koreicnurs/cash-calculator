@@ -81,6 +81,13 @@ const App = () => {
         });
     };
 
+    const removePerson = (id) => {
+      const peopleCopy = people.filter(p => {
+          return p.id !== id
+      })
+        setPeople(peopleCopy)
+    }
+
     return (
         <>
             <div className='choice'>
@@ -120,7 +127,7 @@ const App = () => {
                                        onChange={(e) => bindingPerson(e.target.name, e.target.value, person.id)}/>
                                 <input type="text" name='price' value={person.price}
                                        onChange={(e) => bindingPerson(e.target.name, e.target.value, person.id)}/>
-                                <button type='button'>Remove</button>
+                                <button type='button' onClick={() => removePerson(person.id)}>Remove</button>
                             </div>
                         ))}
                         <button type='button' onClick={addPerson}>Add</button>
