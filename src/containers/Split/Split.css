@@ -1,4 +1,27 @@
 .form-control {
     max-width: 300px;
-    margin: 10px 0;
+    color: #1f8856;
+}
+
+.box-input {
+    display: flex;
+    flex-direction: column;
+    width: 20% !important;
+    align-items: center;
+}
+
+.info-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+}
+
+.info-text {
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+.info-number {
+    align-self: center;
 }

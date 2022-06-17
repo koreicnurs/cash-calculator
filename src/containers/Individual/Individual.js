@@ -2,8 +2,11 @@ import React from 'react';
 import Buttons from "../../components/Buttons/Buttons";
 import {nanoid} from "nanoid";
 import {useState} from "react";
+import './Individual.css'
+import Input from "../../components/Input/Input";
+import Span from "../../components/Span/Span";
 
-const Individual = (props) => {
+const Individual = () => {
 
     const [order, setOrder] = useState({
         tips: 0,
@@ -58,12 +61,21 @@ const Individual = (props) => {
 
     const countEach = () => {
         let a = 0;
+        let b = 0;
         const copyP = people.map(p => {
-            a += ((p.price * order.tips) / 100) + Number(p.price)
-            return {
-                ...p,
-                resultPricePerson: ((p.price * order.tips) / 100) + Number(p.price)
+            if (p.price < 0 || !Number(p.price) || p.name === '' || !String(p.name) || order.transfer < 0 || order.tips < 0 || !Number(order.tips)) {
+                alert('Not correct data');
+            } else {
+                a += Math.ceil((p.price * order.tips) / 100) + Number(p.price) + Number(order.transfer)
+                if (order.transfer > 0 && Number(order.transfer)) {
+                    b = Math.ceil(order.transfer / people.length)
+                }
+                return {
+                    ...p,
+                    resultPricePerson: Math.ceil((p.price * order.tips) / 100) + Number(p.price) + b
+                }
             }
+            return p
         })
         personPrice = a
         setPersonPrice(personPrice)
@@ -74,20 +86,36 @@ const Individual = (props) => {
         <form className='each'>
             <h3>Every man for himself</h3>
             {people.map(person => (
-                <div key={person.id} className='each__inner'>
+                <div key={person.id} className='input-group'>
+                    <Span name="input-group-text" info='First name and your cash<'/>
                     <input className="form-control" type="text" name='name' value={person.name}
                            onChange={(e) => bindingPerson(e.target.name, e.target.value, person.id)}/>
-                    <input className="form-control" type="text" name='price' value={person.price}
+                    <input className="form-control" type="text" name='price'
+                           value={person.price}
                            onChange={(e) => bindingPerson(e.target.name, e.target.value, person.id)}/>
-                    <Buttons btnClass='btn-danger' run={() => removePerson(person.id)} name='Remove'/>
+                    <Buttons btnClass='btn btn-danger' run={() => removePerson(person.id)} name='Remove'/>
                 </div>
             ))}
-            <input className="form-control" type="tipsEach" onChange={e => inputEachCountTips(e.target.value)}/>
-            <input className="form-control" type="transferEach" onChange={e => inputEachCountTransfer(e.target.value)}/>
-            <p>{personPrice}</p>
+            <div className='input-group mb-3'>
+                <div className='input-group'>
+                    <Span name="input-group-text" info='Tips'/>
+                    <Input name="each__input-transfer form-control" type="tipsEach" change={e => inputEachCountTips(e.target.value)}/>
+
+                </div>
+                <div className='input-group'>
+                    <Span name="input-group-text" info='Transfer'/>
+                    <Input name="each__input-transfer form-control" type="transferEach" change={e => inputEachCountTransfer(e.target.value)}/>
+                </div>
+            </div>
+
+            <p className="input-group-text">Price: {personPrice}</p>
             {people.map(p => {
                 return (
-                    <p>{p.name}: {p.resultPricePerson}</p>
+                    <div className="input-group mb-3 span-box" key={p.id + p.index}>
+                        <Span name="input-group-text count-span" info={p.name}/>
+                        <Span name="input-group-text count-span" info={p.resultPricePerson}/>
+                    </div>
+
                 )
             })}
             <Buttons btnClass='btn-info' run={addPerson} name='Add'/>
